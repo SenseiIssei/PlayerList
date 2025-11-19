@@ -31,34 +31,57 @@ jobs:
           echo "PATH=/opt/gradle-8.6/bin:$PATH" >> $GITHUB_ENV
           gradle build
 
-      - name: Create semantic tag (increment patch)
+      - name: Create semantic tag (increment patch, robust against remote tags)
         id: tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Find latest tag starting with 'v'
-          LATEST_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+          # Fetch remote tags
+          git fetch --tags origin || true
+
+          # Get latest remote tag matching vMAJOR.MINOR.PATCH
+          LATEST_TAG=$(git ls-remote --tags origin 'refs/tags/v*' | awk -F/ '{print $NF}' | sed 's/\^{}//' | sort -V | tail -n1)
+
           if [ -z "$LATEST_TAG" ]; then
-            NEW_TAG="v0.0.1"
+            MAJ=0
+            MIN=0
+            PATCH=0
           else
-            # strip leading 'v'
             BASE=${LATEST_TAG#v}
             IFS='.' read -r MAJ MIN PATCH <<< "$BASE"
             MAJ=${MAJ:-0}
             MIN=${MIN:-0}
             PATCH=${PATCH:-0}
-            # fallback if MAJ not numeric
             if ! [[ "$MAJ" =~ ^[0-9]+$ ]]; then
-              NEW_TAG="v0.0.1"
-            else
-              PATCH=$((PATCH + 1))
-              NEW_TAG="v${MAJ}.${MIN}.${PATCH}"
+              MAJ=0; MIN=0; PATCH=0
             fi
           fi
-          echo "Tagging with $NEW_TAG"
-          git tag -a "$NEW_TAG" -m "Automated release $NEW_TAG"
-          git push origin "$NEW_TAG"
-          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+
+          # Try to find next available tag by incrementing PATCH until push succeeds
+          MAX_ATTEMPTS=20
+          attempt=0
+          while [ $attempt -lt $MAX_ATTEMPTS ]; do
+            PATCH=$((PATCH + 1))
+            CAND_TAG="v${MAJ}.${MIN}.${PATCH}"
+            echo "Attempting tag $CAND_TAG (attempt $((attempt+1)))"
+            # Remove any local tag with same name (from previous attempts)
+            git tag -d "$CAND_TAG" 2>/dev/null || true
+            git tag -a "$CAND_TAG" -m "Automated release $CAND_TAG"
+            if git push origin "$CAND_TAG"; then
+              echo "Pushed tag $CAND_TAG"
+              echo "tag=$CAND_TAG" >> $GITHUB_OUTPUT
+              break
+            else
+              echo "Tag $CAND_TAG already exists remotely, trying next patch"
+              # delete local tag and try next
+              git tag -d "$CAND_TAG" 2>/dev/null || true
+            fi
+            attempt=$((attempt+1))
+          done
+          if [ $attempt -ge $MAX_ATTEMPTS ]; then
+            echo "Failed to create a new tag after $MAX_ATTEMPTS attempts" >&2
+            exit 1
+          fi
 
       - name: Ensure or create GitHub Release and upload assets (idempotent)
         run: |
