@@ -60,23 +60,22 @@ jobs:
           git push origin "$NEW_TAG"
           echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          release_name: Release ${{ steps.tag.outputs.tag }}
-          body: "Automated release from CI"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload JARs to release (all in build/libs)
+      - name: Ensure or create GitHub Release and upload assets (idempotent)
         run: |
           TAG=${{ steps.tag.outputs.tag }}
+          echo "Ensuring release for $TAG"
+          # Check if release exists; create if not
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists"
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" -t "Release $TAG" -n "Automated release from CI"
+          fi
+
           echo "Uploading JARs for $TAG"
           for f in build/libs/*.jar; do
             if [ -f "$f" ]; then
-              gh release upload "$TAG" "$f" --repo $GITHUB_REPOSITORY || echo "Failed uploading $f"
+              # overwrite if asset exists
+              gh release upload "$TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber || echo "Failed uploading $f"
             fi
           done
         env:
