@@ -31,17 +31,34 @@ jobs:
           echo "PATH=/opt/gradle-8.6/bin:$PATH" >> $GITHUB_ENV
           gradle build
 
-      - name: Create tag
+      - name: Create semantic tag (increment patch)
         id: tag
         run: |
-          SHORT=$(git rev-parse --short HEAD)
-          TAG="v$(date -u +'%Y%m%d%H%M')-${SHORT}"
-          echo "Tagging with $TAG"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$TAG" -m "Automated release $TAG"
-          git push origin "$TAG"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          # Find latest tag starting with 'v'
+          LATEST_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+          if [ -z "$LATEST_TAG" ]; then
+            NEW_TAG="v0.0.1"
+          else
+            # strip leading 'v'
+            BASE=${LATEST_TAG#v}
+            IFS='.' read -r MAJ MIN PATCH <<< "$BASE"
+            MAJ=${MAJ:-0}
+            MIN=${MIN:-0}
+            PATCH=${PATCH:-0}
+            # fallback if MAJ not numeric
+            if ! [[ "$MAJ" =~ ^[0-9]+$ ]]; then
+              NEW_TAG="v0.0.1"
+            else
+              PATCH=$((PATCH + 1))
+              NEW_TAG="v${MAJ}.${MIN}.${PATCH}"
+            fi
+          fi
+          echo "Tagging with $NEW_TAG"
+          git tag -a "$NEW_TAG" -m "Automated release $NEW_TAG"
+          git push origin "$NEW_TAG"
+          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         id: create_release
