@@ -14,3 +14,24 @@ out/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Build / temp artifacts
+build/
+tmp/
+run/
+generated/
+devlibs/
+libs/
+processIncludeJars/
+loom-cache/
+.gradle/
+*.zip
+
+# Local gradle distributions (if present)
+tools/gradle-*/
+
+# Java
+*.class
+*.log
+*.jar
+.DS_Store

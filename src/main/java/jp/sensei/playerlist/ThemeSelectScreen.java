@@ -28,7 +28,7 @@ public class ThemeSelectScreen extends Screen {
         int y = 40;
         int centerX = width / 2;
 
-        // Scroll Up
+        
         if (scroll > 0) {
             this.addDrawableChild(ButtonWidget.builder(Text.literal("↑ Scroll Up"), btn -> {
                 scroll = Math.max(0, scroll - visibleCount);
@@ -36,7 +36,7 @@ public class ThemeSelectScreen extends Screen {
             }).dimensions(centerX - 100, 10, 200, 20).build());
         }
 
-        // Theme Buttons
+        
         int end = Math.min(scroll + visibleCount, themes.size());
         for (int i = scroll; i < end; i++) {
             CustomTheme theme = themes.get(i);
@@ -62,7 +62,7 @@ public class ThemeSelectScreen extends Screen {
                     .build());
         }
 
-        // Done button
+        
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Done"), btn ->
                         MinecraftClient.getInstance().setScreen(parent))
                 .dimensions(centerX - 100, height - 40, 200, 20)

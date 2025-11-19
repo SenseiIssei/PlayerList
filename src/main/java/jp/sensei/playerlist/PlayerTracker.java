@@ -207,12 +207,12 @@ public class PlayerTracker {
             int backgroundColor = (int)(alpha * 160) << 24;
             context.fill(x, y, x + width, y + (int) currentHudHeight, backgroundColor);
 
-            // Title
+            
             Text title = Text.literal("PlayerList (" + visible.size() + ")").formatted(Formatting.DARK_PURPLE, Formatting.BOLD);
             int titleX = x + (int)((width - client.textRenderer.getWidth(title) * fontScale) / 2);
             drawScaledText(context, title, titleX, y + padding, fontScale, 0xFFFFFF);
 
-            // Headers
+            
             int headersY = y + padding + titleHeight + sectionSpacing;
             drawScaledText(context, Text.literal("Player:"), x + 4, headersY, fontScale, 0xCCCCCC);
             if (showDistance) {
@@ -228,7 +228,7 @@ public class PlayerTracker {
                 UUID uuid = entry.getProfile().getId();
                 int drawY = listStartY + i * lineHeight;
 
-                // Alternate row background
+                
                 if (i % 2 == 1) {
                     int rowAlpha = 30;
                     context.fill(x + 1, drawY - 1, x + width - 1, drawY + lineHeight - 1, (rowAlpha << 24));
@@ -237,7 +237,7 @@ public class PlayerTracker {
                 Identifier skin = client.getSkinProvider().getSkinTextures(entry.getProfile()).texture();
                 context.drawTexture(skin, x + 3, drawY, 8, 8, iconSize, iconSize, 64, 64);
 
-                // Up / Down arrow for Y height
+                
                 String arrow = "";
                 if (client.player != null) {
                     Entity target = client.world.getPlayerByUuid(uuid);
@@ -258,7 +258,7 @@ public class PlayerTracker {
                 drawScaledText(context, Text.literal(trimmed + arrow), textX, drawY + textYOffset, fontScale, textColor);
                 nameClickZones.put(new Rect(textX, drawY + textYOffset, 100, lineHeight), uuid);
 
-                // Distance display
+                
                 if (showDistance && client.player != null) {
                     Entity target = client.world.getPlayerByUuid(uuid);
                     if (target != null) {
@@ -271,7 +271,7 @@ public class PlayerTracker {
                 }
             }
 
-            // Footer
+            
             Text footer = Text.literal("Made by SenseiIssei").formatted(Formatting.DARK_PURPLE);
             float footerScale = Math.min(1f, scale * 0.9f * PlayerListConfig.config.fontScaleMultiplier);
             int footerX = x + (int)(width - client.textRenderer.getWidth(footer) * footerScale) - 4;
@@ -279,7 +279,7 @@ public class PlayerTracker {
             drawScaledText(context, footer, footerX, footerY, footerScale, 0xFFFFFF);
         }
 
-        // Sticky Tracker arrow (always on screen)
+        
         if (PlayerListConfig.config.stickyTrackerEnabled && PlayerListConfig.config.stickyTarget != null && client.player != null && client.world != null) {
             Entity target = client.world.getPlayerByUuid(PlayerListConfig.config.stickyTarget);
             if (target != null) {

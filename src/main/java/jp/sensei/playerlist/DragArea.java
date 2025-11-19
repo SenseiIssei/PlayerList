@@ -29,7 +29,6 @@ public class DragArea {
         int y = ySupplier.getAsInt();
         int w = widthSupplier.getAsInt();
 
-        // Draw translucent bar on top for dragging
         context.fill(x, y, x + w, y + 15, 0x80000000);
         context.drawCenteredTextWithShadow(client.textRenderer, Text.literal("Drag here"), x + w / 2, y + 4, 0xCCCCCC);
     }

@@ -22,7 +22,7 @@ public class ExcludedNamesScreen extends Screen {
 
     @Override
     protected void init() {
-        this.clearChildren(); // Clear previous children when reopening
+        this.clearChildren();
 
         int centerX = width / 2;
         inputField = new TextFieldWidget(textRenderer, centerX - 100, 30, 200, 20, Text.literal("Add Name"));
@@ -42,7 +42,6 @@ public class ExcludedNamesScreen extends Screen {
     }
 
     private void rebuild() {
-        // Remove and re-add exclusion entries
         List<String> list = PlayerListConfig.config.excludedNames;
         int startY = 90;
         int centerX = width / 2;
@@ -59,7 +58,6 @@ public class ExcludedNamesScreen extends Screen {
             }).dimensions(centerX - 100, y, 200, 20).build());
         }
 
-        // Navigation buttons
         if (scrollIndex > 0) {
             this.addDrawableChild(ButtonWidget.builder(Text.literal("↑ Prev"), btn -> {
                 scrollIndex = Math.max(0, scrollIndex - VISIBLE_COUNT);
@@ -74,7 +72,6 @@ public class ExcludedNamesScreen extends Screen {
             }).dimensions(centerX + 5, height - 70, 95, 20).build());
         }
 
-        // Done button
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Done"), btn -> {
             PlayerListConfig.save();
             MinecraftClient.getInstance().setScreen(parent);

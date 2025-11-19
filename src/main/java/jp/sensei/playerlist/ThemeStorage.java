@@ -26,7 +26,7 @@ public class ThemeStorage {
             try (Writer writer = new FileWriter(file)) {
                 GSON.toJson(theme, writer);
             }
-            loadThemes(); // refresh list after saving
+            loadThemes();
         } catch (IOException e) {
             e.printStackTrace();
         }

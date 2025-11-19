@@ -32,10 +32,10 @@ public class PlayerList implements ClientModInitializer {
             }
         });
 
-        if (PlayerListConfig.config.minimapEnabled) {
-            HudRenderCallback.EVENT.register((context, tickDelta) -> {
+        HudRenderCallback.EVENT.register((context, tickDelta) -> {
+            if (PlayerListConfig.config.minimapEnabled) {
                 RadarRenderer.render(context, true);
-            });
-        }
+            }
+        });
     }
 }

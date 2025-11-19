@@ -43,7 +43,8 @@ public class PlayerListConfig {
         public float sectionSpacingScale = 1.0f;            // Section spacing scale
 
         // === Radar & Minimap Display ===
-        public boolean minimapEnabled = true;
+        // Default minimap/radar is OFF to avoid unnecessary CPU/memory usage on low-end systems.
+        public boolean minimapEnabled = false;
 
         public boolean radarModeCircular = true;    // true = radar (circular), false = minimap (rectangular)
 
@@ -52,6 +53,11 @@ public class PlayerListConfig {
 
         // === Radar/Minimap Position & Size ===
         public int minimapPixelStep = 2;
+        // Maximum total 'pixels' to generate for minimap cache before increasing sampling.
+        // This caps memory usage for the generated color grid (pixelsWide * pixelsHigh).
+        public int minimapMaxPixels = 2000;
+        // Max entries in the color cache before it gets cleared to avoid unbounded growth.
+        public int minimapCacheMaxEntries = 2000;
         public float minimapFontScale = 0.5f;                // default smaller font for minimap
         public float minimapZoom = 2f;                       // blocks per pixel zoom for minimap (lower = bigger zoom)
         public int radarX = 10;

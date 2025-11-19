@@ -20,7 +20,7 @@ public class PlayerListScreen extends Screen {
     private DragArea radarDragArea;
 
     private int scrollOffset = 0;
-    // contentTop is the Y pixel where contentPanel starts (below title and tab bar)
+    
     private int contentTop;
 
     public PlayerListScreen() {
@@ -29,7 +29,7 @@ public class PlayerListScreen extends Screen {
 
     @Override
     protected void init() {
-        tabBar = new TabBar(this, width, 30);
+        tabBar = new TabBar(this, width, 28);
 
         hudResizeHandle = new ResizeHandle(
                 () -> PlayerListConfig.config.hudX,
@@ -66,7 +66,6 @@ public class PlayerListScreen extends Screen {
             case HUD -> contentPanel = SubmenuFactory.createHudMenu(this);
             case RADAR -> contentPanel = SubmenuFactory.createRadarMenu(this);
             case TRACKED -> contentPanel = SubmenuFactory.createTrackedMenu(this);
-            case THEMES -> contentPanel = SubmenuFactory.createThemesMenu(this);
         }
         scrollOffset = 0;
     }
@@ -77,22 +76,30 @@ public class PlayerListScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.fill(0, 0, width, height, 0xDD000000);
+        context.fill(0, 0, width, height, 0xC0000000);
 
-        int titleY = 10;
-        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, titleY, 0xFFFFFF);
+        
+        
+        int panelW = Math.min(920, width - 60);
+        int panelH = Math.min(560, height - 80);
+        int panelX = (width - panelW) / 2;
+        int panelY = (height - panelH) / 2;
+        context.fill(panelX, panelY, panelX + panelW, panelY + panelH, 0xE0101A1F);
 
-        int tabBarY = titleY + 20;
+        int titleY = panelY + 6;
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("PlayerList Settings"), width / 2, titleY, 0xFFFFFFFF);
+
+        int tabBarY = titleY + 8;
         tabBar.render(context, mouseX, mouseY);
 
-        contentTop = tabBarY + 30;
+        contentTop = tabBarY + 12;
 
-        int contentAreaHeight = height - contentTop - 20;
+        int contentAreaHeight = panelY + panelH - contentTop - 20;
 
         context.getMatrices().push();
-        context.getMatrices().translate(0, contentTop - scrollOffset, 0);
-        context.enableScissor(0, contentTop, width, contentAreaHeight);
-        contentPanel.render(context, mouseX, mouseY);
+        context.getMatrices().translate(panelX, contentTop - scrollOffset, 0);
+        context.enableScissor(panelX, contentTop, panelW, contentAreaHeight);
+        contentPanel.render(context, mouseX - panelX, mouseY - contentTop + scrollOffset, panelW);
         context.disableScissor();
         context.getMatrices().pop();
 
@@ -114,7 +121,11 @@ public class PlayerListScreen extends Screen {
             return true;
         }
 
-        int adjustedMouseY = (int)(mouseY + scrollOffset - contentTop);
+        int panelW = Math.min(920, width - 60);
+        int panelX = (width - panelW) / 2;
+        
+        int adjustedMouseX = (int) (mouseX - panelX);
+        int adjustedMouseY = (int) (mouseY - contentTop + scrollOffset);
 
         if (hudResizeHandle.mouseClicked(mouseX, mouseY)) return true;
         if (hudDragArea.mouseClicked(mouseX, mouseY)) return true;
@@ -122,7 +133,7 @@ public class PlayerListScreen extends Screen {
         if (radarResizeHandle.mouseClicked(mouseX, mouseY)) return true;
         if (radarDragArea.mouseClicked(mouseX, mouseY)) return true;
 
-        if (contentPanel.mouseClicked(mouseX, adjustedMouseY)) return true;
+        if (contentPanel.mouseClicked(adjustedMouseX, adjustedMouseY, panelW)) return true;
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -170,8 +181,11 @@ public class PlayerListScreen extends Screen {
             return true;
         }
 
-        int adjustedMouseY = (int)(mouseY + scrollOffset - contentTop);
-        if (contentPanel.mouseDragged(mouseX, adjustedMouseY, deltaX, deltaY)) return true;
+        int panelW = Math.min(920, width - 60);
+        int panelX = (width - panelW) / 2;
+        int adjustedMouseX = (int) (mouseX - panelX);
+        int adjustedMouseY = (int) (mouseY - contentTop + scrollOffset);
+        if (contentPanel.mouseDragged(adjustedMouseX, adjustedMouseY, deltaX, deltaY, panelW)) return true;
 
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -179,19 +193,13 @@ public class PlayerListScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double vertical) {
         scrollOffset -= vertical * 20;
-        // Clamp scrollOffset so content panel never scrolls too far or less than 0
+        int panelW = Math.min(920, width - 60);
+        int panelH = Math.min(560, height - 80);
+        int available = panelH - 40;
         scrollOffset = Math.max(0,
-                Math.min(scrollOffset,
-                        Math.max(0, contentPanel.getContentHeight() - (height - contentTop - 20))
-                ));
+            Math.min(scrollOffset,
+                Math.max(0, contentPanel.getContentHeight(panelW) - available)
+            ));
         return true;
-    }
-
-    public void openThemeFolder() {
-        try {
-            java.awt.Desktop.getDesktop().open(new java.io.File("config/playerlist/themes"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

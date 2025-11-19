@@ -37,6 +37,9 @@ public class RadarRenderer {
     private static int cachedHeight = 0;
     private static long lastUpdateTime = 0;
     private static final long UPDATE_INTERVAL_MS = 1000;
+    private static int cachedPixelStep = 1;
+    private static final int MAX_MINIMAP_PIXELS = 2000;
+    private static final int COLOR_CACHE_MAX = 2000;
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static Future<?> generationTask = null;
@@ -75,7 +78,7 @@ public class RadarRenderer {
         World world = client.world;
         Vec3d playerPos = client.player.getPos();
 
-        // Background + border
+        
         context.fill(x, y, x + width, y + height, PlayerListConfig.config.radarBackgroundColor);
         int borderColor = 0xFF555555;
         context.fill(x, y, x + width, y + BORDER_SIZE, borderColor);
@@ -168,7 +171,7 @@ public class RadarRenderer {
         World world = client.world;
         BlockPos playerBlockPos = client.player.getBlockPos();
 
-        // Background + border
+        
         context.fill(x, y, x + width, y + height, PlayerListConfig.config.radarBackgroundColor);
         int borderColor = 0xFF555555;
         context.fill(x, y, x + width, y + BORDER_SIZE, borderColor);
@@ -187,7 +190,8 @@ public class RadarRenderer {
         }
 
         if (generatedColors != null) {
-            drawCachedMinimap(context, x, y, width, height, generatedColors, pixelStep);
+            
+            drawCachedMinimap(context, x, y, width, height, generatedColors, cachedPixelStep);
         }
 
         if (showCompass) {
@@ -203,12 +207,31 @@ public class RadarRenderer {
         generationTask = executor.submit(() -> {
             int pixelsWide = width / pixelStep + 1;
             int pixelsHigh = height / pixelStep + 1;
+
+            
+            long totalPixels = (long) pixelsWide * (long) pixelsHigh;
+            int effectivePixelStep = pixelStep;
+            if (totalPixels > MAX_MINIMAP_PIXELS) {
+                double factor = Math.ceil(Math.sqrt((double) totalPixels / MAX_MINIMAP_PIXELS));
+                effectivePixelStep = Math.max(1, (int) (pixelStep * factor));
+                pixelsWide = width / effectivePixelStep + 1;
+                pixelsHigh = height / effectivePixelStep + 1;
+            }
+
             int[][] colors = new int[pixelsWide][pixelsHigh];
+
+            
+            cachedPixelStep = effectivePixelStep;
+
+            
+            if (colorCache.size() > COLOR_CACHE_MAX) {
+                colorCache.clear();
+            }
 
             for (int px = 0; px < pixelsWide; px++) {
                 for (int py = 0; py < pixelsHigh; py++) {
-                    int worldX = center.getX() + Math.round((px * pixelStep - width / 2f) * zoom);
-                    int worldZ = center.getZ() + Math.round((py * pixelStep - height / 2f) * zoom);
+                    int worldX = center.getX() + Math.round((px * effectivePixelStep - width / 2f) * zoom);
+                    int worldZ = center.getZ() + Math.round((py * effectivePixelStep - height / 2f) * zoom);
                     int worldY = center.getY();
 
                     BlockPos topBlockPos = findTopBlockPos(world, worldX, worldZ, worldY);
@@ -256,7 +279,7 @@ public class RadarRenderer {
             int tint = provider.getColor(blockState, world, pos, 0);
             if (tint != 0) return tint;
         }
-        return 0xFFFFFF; // no tint (white)
+        return 0xFFFFFF;
     }
 
     private static float getLightLevel(World world, BlockPos pos) {
@@ -299,16 +322,15 @@ public class RadarRenderer {
     private static int sampleSpriteColor(Sprite sprite, float u, float v) {
         if (sprite == null) return 0xFF888888;
 
-        // Sprite does NOT have getWidth/getHeight/getPixels in 1.21 Fabric Yarn
-        // So we cannot sample pixels directly here
-        // Instead, fallback to average color approximation:
+        
+        
+        
         return approximateSpriteColor(sprite);
     }
 
     private static int approximateSpriteColor(Sprite sprite) {
-        // Cannot sample pixels directly in Fabric 1.21 Yarn
-        // As an approximation, return white with sprite's average color (if possible)
-        // For now, just return white with full opacity as fallback:
+        
+        
         return 0xFFFFFFFF;
     }
 

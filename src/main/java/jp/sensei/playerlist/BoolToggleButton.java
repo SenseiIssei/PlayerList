@@ -5,37 +5,65 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class BoolToggleButton implements UIComponent {
     private final MinecraftClient client = MinecraftClient.getInstance();
 
     private final String label;
-    private boolean value;
+    private final Supplier<Boolean> getter;
     private final Consumer<Boolean> setter;
 
-    private final int width = 200;
-    private final int height = 20;
+    private final int height = 22;
+    private float anim = 0f;
 
-    public BoolToggleButton(String label, boolean value, Consumer<Boolean> setter) {
+    public BoolToggleButton(String label, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         this.label = label;
-        this.value = value;
+        this.getter = getter;
         this.setter = setter;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, int yOffset) {
-        int x = client.getWindow().getScaledWidth() / 2 - width / 2;
-        context.fill(x, yOffset, x + width, yOffset + height, 0xAA333333);
-        String text = label + ": " + (value ? "ON" : "OFF");
-        context.drawCenteredTextWithShadow(client.textRenderer, Text.literal(text), x + width / 2, yOffset + 6, 0xFFFFFF);
+    public void render(DrawContext context, int mouseX, int mouseY, int yOffset, int width) {
+        int x = 8;
+        int cardH = height;
+        int cardW = width;
+        boolean hovered = mouseX >= x && mouseX <= x + cardW && mouseY >= yOffset && mouseY <= yOffset + cardH;
+        int bg = hovered ? 0xFF263145 : 0xFF1F2937;
+        context.fill(x, yOffset, x + cardW, yOffset + cardH, bg);
+        context.drawText(client.textRenderer, Text.literal(label), x + 6, yOffset + 6, 0xFFD1D5DB, false);
+        
+        
+        
+        
+        int pillW = 44;
+        int pillX = x + cardW - pillW - 8;
+        int pillY = yOffset + 4;
+        int pillH = cardH - 8;
+        boolean value = getter.get();
+        
+        float target = value ? 1f : 0f;
+        anim += (target - anim) * 0.25f;
+        int bgBlend = value ? 0xFF10B981 : 0xFF374151;
+        context.fill(pillX, pillY, pillX + pillW, pillY + pillH, bgBlend);
+        int circleSize = pillH - 6;
+        int minX = pillX + 4;
+        int maxX = pillX + pillW - 4 - circleSize;
+        int circleX = minX + Math.round((maxX - minX) * anim);
+        int circleY = pillY + 3;
+        context.fill(circleX, circleY, circleX + circleSize, circleY + circleSize, 0xFFFFFFFF);
+        
+        String status = value ? "ON" : "OFF";
+        context.drawText(client.textRenderer, Text.literal(status), pillX + 6, yOffset + 6, 0xFF04111A, false);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int yOffset) {
-        int x = client.getWindow().getScaledWidth() / 2 - width / 2;
-        if (mouseX >= x && mouseX <= x + width && mouseY >= yOffset && mouseY <= yOffset + height) {
-            value = !value;
-            setter.accept(value);
+    public boolean mouseClicked(double mouseX, double mouseY, int yOffset, int width) {
+        int x = 12;
+        int cardW = width;
+        if (mouseX >= x && mouseX <= x + cardW && mouseY >= yOffset && mouseY <= yOffset + height) {
+            boolean newVal = !getter.get();
+            setter.accept(newVal);
             PlayerListConfig.save();
             return true;
         }
@@ -43,7 +71,7 @@ public class BoolToggleButton implements UIComponent {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, double deltaX, double deltaY) { return false; }
+    public boolean mouseDragged(double mouseX, double mouseY, double deltaX, double deltaY, int width) { return false; }
 
     @Override
     public void mouseReleased() {}
