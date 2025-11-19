@@ -19,7 +19,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
+      - name: Install Gradle 8.6 and build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://services.gradle.org/distributions/gradle-8.6-bin.zip -O gradle.zip
+          unzip gradle.zip -d /opt
+          echo "PATH=/opt/gradle-8.6/bin:$PATH" >> $GITHUB_ENV
+          gradle build
