@@ -402,7 +402,6 @@ public class RadarRenderer {
         int selfDotSize = Math.max(PLAYER_DOT_SIZE_MIN, PlayerListConfig.config.selfDotSize);
         int playerDotSize = Math.max(PLAYER_DOT_SIZE_MIN, PlayerListConfig.config.playerDotSize);
 
-        // Draw self dot (green)
         context.fill((int) (centerX - selfDotSize / 2), (int) (centerY - selfDotSize / 2), (int) (centerX + selfDotSize / 2), (int) (centerY + selfDotSize / 2), 0xFF00FF00);
 
         for (PlayerListEntry entry : entries) {

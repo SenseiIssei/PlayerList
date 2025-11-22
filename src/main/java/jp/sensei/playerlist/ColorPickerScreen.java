@@ -57,17 +57,15 @@ public class ColorPickerScreen extends Screen {
         drawSlider(context, x, y + 60, b, "Blue",   0x0000FF, draggingB);
         drawSlider(context, x, y + 90, a, "Alpha",  0xAAAAAA, draggingA);
 
-        // Live Color Preview
         int preview = (a << 24) | (r << 16) | (g << 8) | b;
         context.fill(x + 220, y, x + 270, y + 120, preview);
         context.drawBorder(x + 220, y, 50, 120, 0xFFFFFFFF);
 
-        // Presets
-        drawPreset(context, x + 10, y + 130, 0xFF0000FF, mouseX, mouseY); // Blue
-        drawPreset(context, x + 40, y + 130, 0xFFFF0000, mouseX, mouseY); // Red
-        drawPreset(context, x + 70, y + 130, 0xFF00FF00, mouseX, mouseY); // Green
-        drawPreset(context, x + 100, y + 130, 0xFFFFFFFF, mouseX, mouseY); // White
-        drawPreset(context, x + 130, y + 130, 0xA0000000, mouseX, mouseY); // Semi-black
+        drawPreset(context, x + 10, y + 130, 0xFF0000FF, mouseX, mouseY);
+        drawPreset(context, x + 40, y + 130, 0xFFFF0000, mouseX, mouseY);
+        drawPreset(context, x + 70, y + 130, 0xFF00FF00, mouseX, mouseY);
+        drawPreset(context, x + 100, y + 130, 0xFFFFFFFF, mouseX, mouseY);
+        drawPreset(context, x + 130, y + 130, 0xA0000000, mouseX, mouseY);
 
         super.render(context, mouseX, mouseY, delta);
     }

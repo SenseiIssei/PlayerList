@@ -272,11 +272,11 @@ public class PlayerTracker {
             }
 
             
-            Text footer = Text.literal("Made by SenseiIssei").formatted(Formatting.DARK_PURPLE);
-            float footerScale = Math.min(1f, scale * 0.9f * PlayerListConfig.config.fontScaleMultiplier);
-            int footerX = x + (int)(width - client.textRenderer.getWidth(footer) * footerScale) - 4;
-            int footerY = listStartY + displayCount * lineHeight + sectionSpacing;
-            drawScaledText(context, footer, footerX, footerY, footerScale, 0xFFFFFF);
+            // Text footer = Text.literal("Made by SenseiIssei").formatted(Formatting.DARK_PURPLE);
+            // float footerScale = Math.min(1f, scale * 0.9f * PlayerListConfig.config.fontScaleMultiplier);
+            // int footerX = x + (int)(width - client.textRenderer.getWidth(footer) * footerScale) - 4;
+            // int footerY = listStartY + displayCount * lineHeight + sectionSpacing;
+            // drawScaledText(context, footer, footerX, footerY, footerScale, 0xFFFFFF);
         }
 
         

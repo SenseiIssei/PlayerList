@@ -5,7 +5,6 @@ import java.util.Objects;
 public class CustomTheme {
     public String name = "Unnamed";
 
-    // Theme settings
     public int radarColor = 0x60000000;
     public int minimapColor = 0x60000000;
     public int playerColor = 0xFFFF0000;

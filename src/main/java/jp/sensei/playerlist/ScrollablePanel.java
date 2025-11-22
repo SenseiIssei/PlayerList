@@ -7,19 +7,17 @@ import java.util.List;
 
 public class ScrollablePanel {
     private final List<UIComponent> components = new ArrayList<>();
-    private int yOffset = 12;
 
     public void addComponent(UIComponent component) {
         components.add(component);
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, int availableWidth) {
-        int y = yOffset;
-        int padding = 8;
-        int gap = 12;
-        int innerW = Math.max(120, availableWidth - padding * 2);
-        int columns = (availableWidth >= 900) ? 3 : (availableWidth >= 520 ? 2 : 1);
-        int colW = (innerW - (columns - 1) * gap) / columns;
+        int padding = PlayerListConfig.config.menuInnerPadding;
+        int y = padding;
+        int columns = (availableWidth < 480) ? 1 : 2;
+        int gap = PlayerListConfig.config.menuGap;
+        int colW = Math.max(120, (availableWidth - padding * 2 - (columns - 1) * gap) / columns);
 
         
         for (int i = 0; i < components.size(); i += columns) {
@@ -38,17 +36,16 @@ public class ScrollablePanel {
                 if (idx >= components.size()) break;
                 rowH = Math.max(rowH, components.get(idx).getHeight());
             }
-            y += rowH + 6;
+            y += rowH + gap;
         }
     }
 
     public boolean mouseClicked(double mx, double my, int availableWidth) {
-        int y = yOffset;
-        int padding = 8;
-        int gap = 12;
-        int innerW = Math.max(120, availableWidth - padding * 2);
-        int columns = (availableWidth >= 900) ? 3 : (availableWidth >= 520 ? 2 : 1);
-        int colW = (innerW - (columns - 1) * gap) / columns;
+        int padding = PlayerListConfig.config.menuInnerPadding;
+        int y = padding;
+        int columns = (availableWidth < 480) ? 1 : 2;
+        int gap = PlayerListConfig.config.menuGap;
+        int colW = Math.max(120, (availableWidth - padding * 2 - (columns - 1) * gap) / columns);
 
         for (int i = 0; i < components.size(); i += columns) {
             for (int col = 0; col < columns; col++) {
@@ -64,17 +61,16 @@ public class ScrollablePanel {
                 if (idx >= components.size()) break;
                 rowH = Math.max(rowH, components.get(idx).getHeight());
             }
-            y += rowH + 6;
+            y += rowH + gap;
         }
         return false;
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, double deltaX, double deltaY, int availableWidth) {
-        int padding = 8;
-        int gap = 12;
-        int innerW = Math.max(120, availableWidth - padding * 2);
-        int columns = (availableWidth >= 900) ? 3 : (availableWidth >= 520 ? 2 : 1);
-        int colW = (innerW - (columns - 1) * gap) / columns;
+        int columns = (availableWidth < 480) ? 1 : 2;
+        int padding = PlayerListConfig.config.menuInnerPadding;
+        int gap = PlayerListConfig.config.menuGap;
+        int colW = Math.max(120, (availableWidth - padding * 2 - (columns - 1) * gap) / columns);
 
         for (int i = 0; i < components.size(); i += columns) {
             for (int col = 0; col < columns; col++) {
@@ -95,10 +91,10 @@ public class ScrollablePanel {
     }
 
     public int getContentHeight(int availableWidth) {
-        int padding = 8;
-        int gap = 12;
-        int innerW = Math.max(120, availableWidth - padding * 2);
-        int columns = (availableWidth >= 900) ? 3 : (availableWidth >= 520 ? 2 : 1);
+        int columns = (availableWidth < 480) ? 1 : 2;
+        int padding = PlayerListConfig.config.menuInnerPadding;
+        int gap = PlayerListConfig.config.menuGap;
+        int rows = (components.size() + columns - 1) / columns;
         int total = 0;
         for (int i = 0; i < components.size(); i += columns) {
             int rowH = 0;
@@ -107,8 +103,9 @@ public class ScrollablePanel {
                 if (idx >= components.size()) break;
                 rowH = Math.max(rowH, components.get(idx).getHeight());
             }
-            total += rowH + 6;
+            total += rowH;
         }
-        return total + yOffset;
+        int totalGaps = Math.max(0, rows - 1) * gap;
+        return padding + total + totalGaps + padding;
     }
 }

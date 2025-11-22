@@ -10,7 +10,7 @@ public class ActionButton implements UIComponent {
     private final String label;
     private final Runnable action;
 
-    private final int height = 26;
+    private final int height = 20;
 
     public ActionButton(String label, Runnable action) {
         this.label = label;
@@ -26,7 +26,7 @@ public class ActionButton implements UIComponent {
         int bg = hovered ? 0xFF1E40AF : 0xFF2563EB;
         context.fill(x, yOffset, x + cardW, yOffset + cardH, bg);
         int textW = client.textRenderer.getWidth(label);
-        context.drawText(client.textRenderer, Text.literal(label), x + (cardW - textW) / 2, yOffset + 6, 0xFFFFFFFF, false);
+        context.drawText(client.textRenderer, Text.literal(label), x + (cardW - textW) / 2, yOffset + (getHeight() - 8) / 2, 0xFFFFFFFF, false);
     }
 
     @Override
@@ -47,5 +47,5 @@ public class ActionButton implements UIComponent {
     public void mouseReleased() {}
 
     @Override
-    public int getHeight() { return height; }
+    public int getHeight() { return PlayerListConfig.config.menuRowHeight; }
 }

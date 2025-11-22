@@ -9,7 +9,8 @@ public class TabBar {
         GENERAL("General"),
         HUD("HUD & Scaling"),
         RADAR("Radar & Minimap"),
-        TRACKED("Tracked Players");
+        TRACKED("Tracked Players"),
+        STYLE("Style");
 
         public final String displayName;
         Tab(String displayName) { this.displayName = displayName; }
@@ -40,9 +41,9 @@ public class TabBar {
         int startX = (width - (tabWidth * Tab.values().length + (Tab.values().length - 1) * gap)) / 2;
         int y = stripY + 4;
 
-        int accent = 0xFF3B82F6;
+        int accent = PlayerListConfig.config.menuAccentColor;
         int inactiveBg = 0xAA222222;
-        int inactiveText = 0xFFDDDDDD;
+        int inactiveText = PlayerListConfig.config.menuTextColor;
 
         for (Tab tab : Tab.values()) {
             int x = startX + tab.ordinal() * (tabWidth + gap);

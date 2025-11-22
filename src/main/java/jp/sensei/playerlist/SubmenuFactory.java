@@ -81,4 +81,20 @@ public class SubmenuFactory {
 
         return panel;
     }
+
+    public static ScrollablePanel createStyleMenu(PlayerListScreen screen) {
+        ScrollablePanel panel = new ScrollablePanel();
+
+        panel.addComponent(new ActionButton("Menu Background Color", () -> screen.client.setScreen(new ColorPickerScreen(screen, "Menu Background", PlayerListConfig.config.menuBackgroundColor, color -> { PlayerListConfig.config.menuBackgroundColor = color; PlayerListConfig.save(); }))));
+        panel.addComponent(new ActionButton("Menu Text Color", () -> screen.client.setScreen(new ColorPickerScreen(screen, "Menu Text", PlayerListConfig.config.menuTextColor, color -> { PlayerListConfig.config.menuTextColor = color; PlayerListConfig.save(); }))));
+        panel.addComponent(new ActionButton("Accent Color", () -> screen.client.setScreen(new ColorPickerScreen(screen, "Accent", PlayerListConfig.config.menuAccentColor, color -> { PlayerListConfig.config.menuAccentColor = color; PlayerListConfig.save(); }))));
+
+        panel.addComponent(new FloatSlider("Row Height", 14f, 40f, () -> (float) PlayerListConfig.config.menuRowHeight, v -> { PlayerListConfig.config.menuRowHeight = Math.round(v); PlayerListConfig.save(); }));
+        panel.addComponent(new FloatSlider("Inner Padding", 4f, 24f, () -> (float) PlayerListConfig.config.menuInnerPadding, v -> { PlayerListConfig.config.menuInnerPadding = Math.round(v); PlayerListConfig.save(); }));
+        panel.addComponent(new FloatSlider("Row Gap", 0f, 32f, () -> (float) PlayerListConfig.config.menuGap, v -> { PlayerListConfig.config.menuGap = Math.round(v); PlayerListConfig.save(); }));
+        panel.addComponent(new FloatSlider("Safe Edge (px)", 0f, 80f, () -> (float) PlayerListConfig.config.menuSafeEdge, v -> { PlayerListConfig.config.menuSafeEdge = Math.round(v); PlayerListConfig.save(); }));
+        panel.addComponent(new FloatSlider("Bottom Padding", 0f, 80f, () -> (float) PlayerListConfig.config.menuBottomPadding, v -> { PlayerListConfig.config.menuBottomPadding = Math.round(v); PlayerListConfig.save(); }));
+
+        return panel;
+    }
 }

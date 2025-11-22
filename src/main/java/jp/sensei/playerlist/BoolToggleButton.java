@@ -26,27 +26,28 @@ public class BoolToggleButton implements UIComponent {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, int yOffset, int width) {
         int x = 8;
-        int cardH = height;
+        int cardH = getHeight();
         int cardW = width;
+        int innerPad = PlayerListConfig.config.menuInnerPadding;
         boolean hovered = mouseX >= x && mouseX <= x + cardW && mouseY >= yOffset && mouseY <= yOffset + cardH;
-        int bg = hovered ? 0xFF263145 : 0xFF1F2937;
+        int bg = PlayerListConfig.config.menuBackgroundColor;
         context.fill(x, yOffset, x + cardW, yOffset + cardH, bg);
-        context.drawText(client.textRenderer, Text.literal(label), x + 6, yOffset + 6, 0xFFD1D5DB, false);
+        context.drawText(client.textRenderer, Text.literal(label), x + innerPad, yOffset + (cardH - 8) / 2, PlayerListConfig.config.menuTextColor, false);
         
         
         
         
-        int pillW = 44;
-        int pillX = x + cardW - pillW - 8;
-        int pillY = yOffset + 4;
-        int pillH = cardH - 8;
+        int pillW = Math.max(36, innerPad * 4);
+        int pillX = x + cardW - pillW - innerPad - PlayerListConfig.config.menuSafeEdge;
+        int pillY = yOffset + (cardH - (cardH - 6)) / 2;
+        int pillH = cardH - 6;
         boolean value = getter.get();
         
         float target = value ? 1f : 0f;
         anim += (target - anim) * 0.25f;
         int bgBlend = value ? 0xFF10B981 : 0xFF374151;
         context.fill(pillX, pillY, pillX + pillW, pillY + pillH, bgBlend);
-        int circleSize = pillH - 6;
+        int circleSize = Math.max(6, pillH - 6);
         int minX = pillX + 4;
         int maxX = pillX + pillW - 4 - circleSize;
         int circleX = minX + Math.round((maxX - minX) * anim);
@@ -54,14 +55,14 @@ public class BoolToggleButton implements UIComponent {
         context.fill(circleX, circleY, circleX + circleSize, circleY + circleSize, 0xFFFFFFFF);
         
         String status = value ? "ON" : "OFF";
-        context.drawText(client.textRenderer, Text.literal(status), pillX + 6, yOffset + 6, 0xFF04111A, false);
+        context.drawText(client.textRenderer, Text.literal(status), pillX + 6, pillY + (pillH - 8) / 2, 0xFF04111A, false);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int yOffset, int width) {
         int x = 12;
         int cardW = width;
-        if (mouseX >= x && mouseX <= x + cardW && mouseY >= yOffset && mouseY <= yOffset + height) {
+        if (mouseX >= x && mouseX <= x + cardW && mouseY >= yOffset && mouseY <= yOffset + getHeight()) {
             boolean newVal = !getter.get();
             setter.accept(newVal);
             PlayerListConfig.save();

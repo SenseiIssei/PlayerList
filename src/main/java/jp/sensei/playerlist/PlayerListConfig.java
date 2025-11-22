@@ -79,6 +79,16 @@ public class PlayerListConfig {
         public int focusHighlightColor = 0xFF00FFFF;         // Focus player highlight color ARGB
         public int stickyArrowColor = 0xFF00FF00;            // Sticky tracker arrow color ARGB
 
+        // === Menu Styling ===
+        public int menuBackgroundColor = 0xE0101A1F;        // Settings menu background ARGB
+        public int menuTextColor = 0xFFFFFFFF;              // Settings menu text color ARGB
+        public int menuAccentColor = 0xFF3B82F6;            // Accent color for active tabs/buttons
+        public int menuRowHeight = 22;                      // Height of each row in settings
+        public int menuInnerPadding = 20;                   // Inner padding for components
+        public int menuGap = 2;                             // Vertical gap between rows
+        public int menuSafeEdge = 5;                        // Extra safe-edge padding from right side
+        public int menuBottomPadding = 0;                   // Additional bottom padding for menus (configurable)
+
 
 
         // === Focus/Sticky Player Tracking ===
@@ -94,7 +104,7 @@ public class PlayerListConfig {
                     config = GSON.fromJson(reader, Config.class);
                 }
             } else {
-                // Initialize default excluded names (slot_11 .. slot_90)
+                //(slot_11 .. slot_90)
                 for (int i = 11; i <= 90; i++) {
                     config.excludedNames.add("slot_" + i);
                 }

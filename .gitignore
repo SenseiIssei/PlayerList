@@ -27,7 +27,7 @@ loom-cache/
 .gradle/
 *.zip
 
-# Local gradle distributions (if present)
+# Local gradle distributions
 tools/gradle-*/
 
 # Java
